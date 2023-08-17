@@ -2,11 +2,13 @@ import argparse
 from bardapi import Bard
 import os
 import requests
-os.environ['_BARD_API_KEY'] = 'xxxxxxx'
-# token='xxxxxxx'
+from decouple import config
+
+BARD_COOKIE = config('BARD_COOKIE')
+BARD_API_TOKEN = config('BARD_API_TOKEN')
 
 
-def main(cookie, question):
+def main(question):
     session = requests.Session()
     session.headers = {
         "Host": "bard.google.com",
@@ -16,10 +18,9 @@ def main(cookie, question):
         "Origin": "https://bard.google.com",
         "Referer": "https://bard.google.com/",
     }
-    session.cookies.set("__Secure-1PSID", cookie) 
+    session.cookies.set("__Secure-1PSID", BARD_COOKIE) 
 
-    # bard = Bard(token=token, session=session, timeout=30)
-    bard = Bard(session=session, timeout=30)
+    bard = Bard(token=BARD_API_TOKEN, session=session, timeout=30)
 
     answer = bard.get_answer(question)['content']
     print(answer)
@@ -28,7 +29,6 @@ def main(cookie, question):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Parse cookie and question arguments.')
 
-    parser.add_argument('--cookie', required=True, help='Cookie value')
     parser.add_argument('--question', required=True, help='Question value')
 
     args = parser.parse_args()
